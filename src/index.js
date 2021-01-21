@@ -14,19 +14,44 @@ import "./forcast.scss";
 import "./weatherIcons.scss";
 import "./footer.scss";
 
-function WeatherApp() {
-  return (
-    <div>
-      <div className="weatherContainer">
-        <WeatherForm />
-        <Results />
-        <Forcast />
-      </div>
+class WeatherApp extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      city: "Zurich",
+      temperature: "-1",
+      date: "16.01.2021",
+      time: "14:20",
+      humidity: 80,
+      wind: 10,
+      clouds: 25,
+      feels: "-5",
+    };
+  }
+
+  cityChanged(newCity) {
+    console.log(this);
+
+    this.setState({
+      city: newCity,
+    });
+  }
+
+  render() {
+    return (
       <div>
-        <Footer />
+        <div className="weatherContainer">
+          <WeatherForm onCityChanged={(newCity) => this.cityChanged(newCity)} />
+          <Results weatherData={this.state} />
+          <Forcast />
+        </div>
+        <div>
+          <Footer />
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 const rootElement = document.getElementById("root");
