@@ -10,7 +10,7 @@ export default function Footer() {
             Foto by Max Kleinen on unsplash
           </a>
         </p>
-        <p id="picture">
+        <p id="video">
           Free Stock video by <a href="http://www.videezy.com">Videezy.com</a>
         </p>
       </footer>
