@@ -16,6 +16,8 @@ import "./weatherIcons.scss";
 import "./footer.scss";
 
 class WeatherApp extends React.Component {
+  static apiKey = "ca867a1ff9a2ba4fcae7d290754eb99e";
+
   constructor(props) {
     super(props);
 
@@ -32,10 +34,18 @@ class WeatherApp extends React.Component {
   }
 
   cityChanged(newCity) {
-    console.log(this);
+    this.loadWeatherData();
+  }
 
+  loadWeatherData(city) {
+    let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric`;
+    axios.get(`${apiUrl}&appid=${apiKey}`).then(updateWeatherData);
+  }
+
+  updateWeatherData(response) {
     this.setState({
-      city: newCity,
+      city: response.data.name,
+      temperature: response.data.main.temp,
     });
   }
 
