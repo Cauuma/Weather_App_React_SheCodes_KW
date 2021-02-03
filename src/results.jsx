@@ -13,7 +13,7 @@ export default function Results(props) {
               {props.weatherData.date} {props.weatherData.time}
             </li>
             <li id="temperature">{props.weatherData.temperature} </li>
-            <WeatherIcons code="13n" />
+            <WeatherIcons code={props.weatherData.icon} />
           </ul>
         </div>
         <div className="col-12 col-md-6 mb-5 mt-5 percent-data">

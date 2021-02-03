@@ -15,37 +15,42 @@ import "./forcast.scss";
 import "./weatherIcons.scss";
 import "./footer.scss";
 
+//Forcast mit Tag
+//Forcast Icons
 class WeatherApp extends React.Component {
-  static apiKey = "ca867a1ff9a2ba4fcae7d290754eb99e";
-
   constructor(props) {
     super(props);
 
     this.state = {
       city: "Zurich",
       temperature: "-1",
-      date: "16.01.2021",
-      time: "14:20",
       humidity: 80,
       wind: 10,
       clouds: 25,
       feels: "-5",
+      icon: "01d",
     };
   }
 
   cityChanged(newCity) {
-    this.loadWeatherData();
+    this.loadWeatherData(newCity);
   }
 
-  loadWeatherData(city) {
-    let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric`;
-    axios.get(`${apiUrl}&appid=${apiKey}`).then(updateWeatherData);
+  loadWeatherData(newCity) {
+    let apiKey = "4eb15a8e1b28fb350a8b50ccc073b27a";
+    let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${newCity}&appid=${apiKey}&units=metric`;
+    axios.get(apiUrl).then((response) => this.updateWeatherData(response));
   }
 
   updateWeatherData(response) {
     this.setState({
       city: response.data.name,
-      temperature: response.data.main.temp,
+      temperature: Math.round(response.data.main.temp),
+      humidity: response.data.main.humidity,
+      wind: response.data.wind.speed,
+      clouds: response.data.clouds.all,
+      feels: Math.round(response.data.main.feels_like),
+      icon: response.data.weather[0].icon,
     });
   }
 
