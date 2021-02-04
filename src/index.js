@@ -17,12 +17,14 @@ import "./footer.scss";
 
 //Forcast mit Tag
 //Forcast Icons
+//Results Update Time
 class WeatherApp extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       city: "Zurich",
+      date: new Date(),
       temperature: "-1",
       humidity: 80,
       wind: 10,
@@ -46,6 +48,7 @@ class WeatherApp extends React.Component {
     this.setState({
       city: response.data.name,
       temperature: Math.round(response.data.main.temp),
+      date: new Date((response.data.dt + response.data.timezone) * 1000),
       humidity: response.data.main.humidity,
       wind: response.data.wind.speed,
       clouds: response.data.clouds.all,
