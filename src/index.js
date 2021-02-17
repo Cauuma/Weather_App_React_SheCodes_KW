@@ -31,6 +31,9 @@ class WeatherApp extends React.Component {
       clouds: 25,
       feels: "-5",
       icon: "01d",
+      lat: 0,
+      lon: 0,
+      forecast: [],
     };
   }
 
@@ -45,16 +48,44 @@ class WeatherApp extends React.Component {
   }
 
   updateWeatherData(response) {
-    this.setState({
-      city: response.data.name,
-      temperature: Math.round(response.data.main.temp),
-      date: new Date((response.data.dt + response.data.timezone) * 1000),
-      humidity: response.data.main.humidity,
-      wind: response.data.wind.speed,
-      clouds: response.data.clouds.all,
-      feels: Math.round(response.data.main.feels_like),
-      icon: response.data.weather[0].icon,
+    console.log(response);
+
+    this.setState(
+      {
+        city: response.data.name,
+        temperature: Math.round(response.data.main.temp),
+        date: new Date((response.data.dt + response.data.timezone) * 1000),
+        humidity: response.data.main.humidity,
+        wind: response.data.wind.speed,
+        clouds: response.data.clouds.all,
+        feels: Math.round(response.data.main.feels_like),
+        icon: response.data.weather[0].icon,
+        lat: response.data.coord.lat,
+        lon: response.data.coord.lon,
+      },
+      () => this.loadForecast(this.state.lat, this.state.lon)
+    );
+  }
+
+  loadForecast(lat, lon) {
+    let apiKey = "4eb15a8e1b28fb350a8b50ccc073b27a";
+    let apiUrl = `https://api.openweathermap.org/data/2.5/onecall?lon=${lon}&lat=${lat}&appid=${apiKey}&units=metric&exclude=current,minutely,hourly,alerts`;
+    axios.get(apiUrl).then((response) => this.updateForecast(response));
+  }
+
+  updateForecast(response) {
+    console.log(response);
+
+    let newForecast = response.data.daily.map((day) => {
+      return {
+        date: new Date(day.dt * 1000),
+        minTemp: day.temp.min,
+        maxTemp: day.temp.max,
+        icon: day.weather[0].icon,
+      };
     });
+
+    this.setState({ forecast: newForecast.slice(1, 7) });
   }
 
   render() {
@@ -63,7 +94,7 @@ class WeatherApp extends React.Component {
         <div className="weatherContainer">
           <WeatherForm onCityChanged={(newCity) => this.cityChanged(newCity)} />
           <Results weatherData={this.state} />
-          <Forcast />
+          <Forcast forecast={this.state.forecast} />
         </div>
         <div>
           <Footer />

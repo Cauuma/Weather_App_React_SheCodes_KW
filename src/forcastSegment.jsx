@@ -1,20 +1,18 @@
+import dayjs from "dayjs";
 import React from "react";
 import WeatherIcons from "./weatherIcons";
 
 export default function ForcastSegment(props) {
-  let forcastData = {
-    day: props.day,
-    minTemp: props.minTemp,
-    maxTemp: props.maxTemp,
-  };
+  const date = dayjs(props.date).format("dddd");
+
   return (
     <div className="col-12 col-sm-6 col-lg-4 col-xl-2">
       <p>
-        {forcastData.day}
+        {date}
         <br />
-        {forcastData.minTemp} | {forcastData.maxTemp}
+        {props.minTemp} | {props.maxTemp}
       </p>
-      <WeatherIcons code="13n" />
+      <WeatherIcons code={props.icon} />
     </div>
   );
 }
