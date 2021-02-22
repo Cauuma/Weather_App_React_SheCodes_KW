@@ -19,37 +19,48 @@ import "./footer.scss";
 //Forcast Icons
 //Results Update Time
 class WeatherApp extends React.Component {
+  apiKey = "4eb15a8e1b28fb350a8b50ccc073b27a";
+
   constructor(props) {
     super(props);
 
     this.state = {
-      city: "Zurich",
-      date: new Date(),
-      temperature: "-1",
-      humidity: 80,
-      wind: 10,
-      clouds: 25,
-      feels: "-5",
-      icon: "01d",
-      lat: 0,
-      lon: 0,
-      forecast: [],
+      isLoaded: false,
+      isLoading: true,
+      units: "metric",
     };
   }
 
-  cityChanged(newCity) {
-    this.loadWeatherData(newCity);
+  componentDidMount() {
+    this.loadWeatherDataByCity("Zurich");
   }
 
-  loadWeatherData(newCity) {
-    let apiKey = "4eb15a8e1b28fb350a8b50ccc073b27a";
-    let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${newCity}&appid=${apiKey}&units=metric`;
-    axios.get(apiUrl).then((response) => this.updateWeatherData(response));
+  cityChanged(newCity) {
+    this.loadWeatherDataByCity(newCity);
+  }
+
+  loadWeatherDataByCity(newCity) {
+    let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${newCity}&appid=${this.apiKey}&units=${this.state.units}`;
+    this.loadWeatherDataByUrl(apiUrl);
+  }
+
+  loadWeatherDataByCoords(lat, lon) {
+    let apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${this.apiKey}&units=${this.state.units}`;
+    this.loadWeatherDataByUrl(apiUrl);
+  }
+
+  loadWeatherDataByUrl(url) {
+    this.setState({ isLoading: true });
+    axios.get(url).then(
+      (response) => this.updateWeatherData(response),
+      (error) => {
+        this.setState({ isLoading: false });
+        alert("An error occurred or city not found!");
+      }
+    );
   }
 
   updateWeatherData(response) {
-    console.log(response);
-
     this.setState(
       {
         city: response.data.name,
@@ -69,13 +80,11 @@ class WeatherApp extends React.Component {
 
   loadForecast(lat, lon) {
     let apiKey = "4eb15a8e1b28fb350a8b50ccc073b27a";
-    let apiUrl = `https://api.openweathermap.org/data/2.5/onecall?lon=${lon}&lat=${lat}&appid=${apiKey}&units=metric&exclude=current,minutely,hourly,alerts`;
+    let apiUrl = `https://api.openweathermap.org/data/2.5/onecall?lon=${lon}&lat=${lat}&appid=${apiKey}&units=${this.state.units}&exclude=current,minutely,hourly,alerts`;
     axios.get(apiUrl).then((response) => this.updateForecast(response));
   }
 
   updateForecast(response) {
-    console.log(response);
-
     let newForecast = response.data.daily.map((day) => {
       return {
         date: new Date(day.dt * 1000),
@@ -85,20 +94,72 @@ class WeatherApp extends React.Component {
       };
     });
 
-    this.setState({ forecast: newForecast.slice(1, 7) });
+    this.setState({
+      forecast: newForecast.slice(1, 7),
+      isLoaded: true,
+      isLoading: false,
+    });
+  }
+
+  switchToCelsius() {
+    this.setState({ units: "metric" }, () => {
+      this.loadWeatherDataByCity(this.state.city);
+    });
+  }
+
+  switchToFahrenheit() {
+    this.setState({ units: "imperial" }, () => {
+      this.loadWeatherDataByCity(this.state.city);
+    });
+  }
+
+  locationByCoords(lat, lon) {
+    this.loadWeatherDataByCoords(lat, lon);
   }
 
   render() {
+    let loadingIndicator = null;
+    if (this.state.isLoading) {
+      loadingIndicator = (
+        <div id="loading-indicator">
+          <div id="floatingCirclesG">
+            <div className="f_circleG" id="frotateG_01"></div>
+            <div className="f_circleG" id="frotateG_02"></div>
+            <div className="f_circleG" id="frotateG_03"></div>
+            <div className="f_circleG" id="frotateG_04"></div>
+            <div className="f_circleG" id="frotateG_05"></div>
+            <div className="f_circleG" id="frotateG_06"></div>
+            <div className="f_circleG" id="frotateG_07"></div>
+            <div className="f_circleG" id="frotateG_08"></div>
+          </div>
+        </div>
+      );
+    }
+
+    var container = null;
+    if (this.state.isLoaded) {
+      container = (
+        <div className="weatherContainer">
+          <WeatherForm
+            onCityChanged={(newCity) => this.cityChanged(newCity)}
+            switchToCelsius={this.switchToCelsius.bind(this)}
+            switchToFahrenheit={this.switchToFahrenheit.bind(this)}
+            locationByCoords={this.locationByCoords.bind(this)}
+          />
+          <Results weatherData={this.state} />
+          <Forcast forecast={this.state.forecast} units={this.state.units} />
+        </div>
+      );
+    }
+
     return (
       <div>
-        <div className="weatherContainer">
-          <WeatherForm onCityChanged={(newCity) => this.cityChanged(newCity)} />
-          <Results weatherData={this.state} />
-          <Forcast forecast={this.state.forecast} />
-        </div>
+        {container}
         <div>
           <Footer />
         </div>
+
+        {loadingIndicator}
       </div>
     );
   }

@@ -10,6 +10,7 @@ export default function Forcast(props) {
         minTemp={forecast.minTemp}
         maxTemp={forecast.maxTemp}
         icon={forecast.icon}
+        units={props.units}
       />
     );
   });

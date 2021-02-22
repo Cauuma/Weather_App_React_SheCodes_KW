@@ -17,6 +17,15 @@ export default function WeatherForm(props) {
     setCity(event.target.value);
   }
 
+  function locationByCoords() {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      props.locationByCoords(lat, lon);
+    });
+  }
+
   return (
     <div className="weatherForm">
       <form onSubmit={handleSubmit}>
@@ -30,13 +39,13 @@ export default function WeatherForm(props) {
         <button id="search" type="submit" className="btn btn-primary me-1">
           <i className="fas fa-search"></i>
         </button>
-        <button id="location" type="button" className="btn btn-primary me-1">
+        <button id="location" type="button" className="btn btn-primary me-1" onClick={locationByCoords}>
           <i className="fas fa-location-arrow"></i>
         </button>
-        <button id="celsius" type="button" className="btn btn-primary me-1">
+        <button id="celsius" type="button" className="btn btn-primary me-1" onClick={props.switchToCelsius}>
           °C
         </button>
-        <button id="fahrenheit" type="button" className="btn btn-primary me-1">
+        <button id="fahrenheit" type="button" className="btn btn-primary me-1" onClick={props.switchToFahrenheit}>
           °F
         </button>
       </form>

@@ -25,6 +25,9 @@ export default function Results(props) {
     return `${day} ${daynumber}.${month}.${year} ${hour}:${minute}:${second}`;
   }
 
+  const unit = props.weatherData.units === "imperial" ? "°F" : "°C";
+  const speed = props.weatherData.units === "imperial" ? "mph" : "km/h";
+
   return (
     <div className="result-container">
       <div className="row">
@@ -32,15 +35,24 @@ export default function Results(props) {
           <ul>
             <h1 id="located-city">{props.weatherData.city}</h1>
             <li id="date">{formatDate(props.weatherData.date)}</li>
-            <li id="temperature">{props.weatherData.temperature} °C </li>
+            <li id="temperature">
+              {props.weatherData.temperature}
+              {unit}
+            </li>
             <WeatherIcons code={props.weatherData.icon} />
           </ul>
         </div>
         <div className="col-12 col-md-6 mb-5 mt-5 percent-data">
           <ul className="mt-3">
-            <li id="feel">feels like: {props.weatherData.feels}°c</li>
+            <li id="feel">
+              feels like: {props.weatherData.feels}
+              {unit}
+            </li>
             <li id="humidity">humidity: {props.weatherData.humidity}%</li>
-            <li id="windspeed">windspeed: {props.weatherData.wind}km/h</li>
+            <li id="windspeed">
+              windspeed: {Math.round(props.weatherData.wind)}
+              {speed}
+            </li>
             <li id="clouds">clouds: {props.weatherData.clouds}%</li>
           </ul>
         </div>
